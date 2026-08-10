@@ -55,3 +55,7 @@ def load_menu(filename):
  
     return menu_items
 
+
+
+root = tk.Tk()
+root.mainloop()
