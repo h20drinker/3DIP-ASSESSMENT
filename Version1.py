@@ -8,7 +8,7 @@ from tkinter import messagebox
 
 MENU_FILE = "menue.csv"
 
-
+# creating a class for menu items and orders
 class menue_item:
     def __init__(self, name, price):
         self.name = name
