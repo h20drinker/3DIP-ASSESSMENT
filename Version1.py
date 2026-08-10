@@ -9,7 +9,7 @@ from tkinter import messagebox
 MENU_FILE = "menue.csv"
 
 # creating a class for menu items and orders
-class menue_item:
+class menu_item:
     def __init__(self, name, price):
         self.name = name
         self.price = price
@@ -48,14 +48,136 @@ def load_menu(filename):
                     print(f"Skipping menu row with negative price: {row}")
                     continue
  
-                menu_items.append(menue_item(name, price))
+                menu_items.append(menu_item(name, price))
  
     except FileNotFoundError:
         print(f"Menu file '{filename}' was not found.")
  
     return menu_items
 
+class App:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Takeaway Order System")
+
+        self.menu_items = load_menu(MENU_FILE)
+        self.order = Order()
+
+        self.build_gui()
+
+    def build_gui(self):
+        menu_frame = tk.LabelFrame(
+            self.root,
+            text="Menu",
+            padx=10,
+            pady=10
+        )
+        menu_frame.grid(
+            row=0,
+            column=0,
+            padx=10,
+            pady=10,
+            sticky="n"
+        )
+
+        if not self.menu_items:
+            tk.Label(
+                menu_frame,
+                text="No menu items found. Check menu.csv.",
+                fg="red",
+            ).pack()
+        else:
+            for item in self.menu_items:
+                button_text = f"{item.name} - ${item.price:.2f}"
+
+                button = tk.Button(
+                    menu_frame,
+                    text=button_text,
+                    width=25,
+                    command=lambda menu_item=item:
+                        self.add_item_to_order(menu_item),
+                )
+
+                button.pack(pady=2)
+
+        order_frame = tk.LabelFrame(
+            self.root,
+            text="Current Order",
+            padx=10,
+            pady=10
+        )
+        order_frame.grid(
+            row=0,
+            column=1,
+            padx=10,
+            pady=10,
+            sticky="n"
+        )
+
+        self.order_listbox = tk.Listbox(
+            order_frame,
+            width=35,
+            height=12
+        )
+        self.order_listbox.pack()
+
+        self.total_label = tk.Label(
+            order_frame,
+            text="Total: $0.00",
+            font=("Arial", 12, "bold")
+        )
+        self.total_label.pack(pady=(10, 5))
+
+        clear_button = tk.Button(
+            order_frame,
+            text="Clear Order",
+            command=self.clear_order
+        )
+        clear_button.pack(pady=5)
+
+    def add_item_to_order(self, item):
+        self.order.add_item(item)
+        self.update_order_display()
+
+    def update_order_display(self):
+        self.order_listbox.delete(0, tk.END)
+
+        for item in self.order.items:
+            self.order_listbox.insert(
+                tk.END,
+                f"{item.name} - ${item.price:.2f}"
+            )
+
+        total = self.order.calculate_total()
+
+        self.total_label.config(
+            text=f"Total: ${total:.2f}"
+        )
+
+    def clear_order(self):
+        if not self.order.items:
+            return
+
+        confirmed = messagebox.askyesno(
+            "Clear Order",
+            "Are you sure you want to clear the current order?"
+        )
+
+        if confirmed:
+            self.order.clear()
+            self.update_order_display()
 
 
-root = tk.Tk()
-root.mainloop()
+        
+
+
+
+
+        
+
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = App(root)
+    root.mainloop()
