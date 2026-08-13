@@ -1,11 +1,10 @@
 #takeaway ordering system verison 1
 
-
-
 import csv
 import tkinter as tk
 from tkinter import messagebox
 
+# Name of the CSV file containing the menu items and prices
 MENU_FILE = "menue.csv"
 
 # creating a class for menu items and orders
@@ -14,6 +13,7 @@ class menu_item:
         self.name = name
         self.price = price
 
+# Stores and manages the customer's order
 class Order:
     def __init__(self):
         self.items = []
@@ -26,6 +26,7 @@ class Order:
     def clear(self):
         self.items = []
 
+# Loads menu items from the CSV file
 def load_menu(filename):
     menu_items = []
     try: 
@@ -55,6 +56,8 @@ def load_menu(filename):
  
     return menu_items
 
+
+# Main application and GUI
 class App:
     def __init__(self, root):
         self.root = root
@@ -135,10 +138,13 @@ class App:
         )
         clear_button.pack(pady=5)
 
+
+    # Adds a menu item and refreshes the order display
     def add_item_to_order(self, item):
         self.order.add_item(item)
         self.update_order_display()
 
+    # Updates the order list and total price
     def update_order_display(self):
         self.order_listbox.delete(0, tk.END)
 
@@ -154,6 +160,7 @@ class App:
             text=f"Total: ${total:.2f}"
         )
 
+    # Clears the order after asking for confirmation
     def clear_order(self):
         if not self.order.items:
             return
@@ -168,15 +175,7 @@ class App:
             self.update_order_display()
 
 
-        
-
-
-
-
-        
-
-
-
+# Start the application
 if __name__ == "__main__":
     root = tk.Tk()
     app = App(root)
