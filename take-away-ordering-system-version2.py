@@ -9,7 +9,7 @@ MENU_FILE = "menu.csv"
 ORDERS_FILE = "orders.csv"
 
 
-class menu_item:
+class MenuItem:
     def __init__(self, name, price):
         self.name = name
         self.price = price
@@ -48,12 +48,31 @@ def load_menu(filename):
                     print(f"Skipping menu row with negative price: {row}")
                     continue
  
-                menu_items.append(menu_item(name, price))
+                menu_items.append(MenuItem(name, price))
  
     except FileNotFoundError:
         print(f"Menu file '{filename}' was not found.")
  
     return menu_items
+
+def validate_payment(payment_text, total):
+    payment_text = payment_text.strip()
+
+    if payment_text == "":
+        return False, "Please enter a payment amount."
+ 
+    try:
+        amount = float(payment_text)
+    except ValueError:
+        return False, "Payment must be a number, e.g. 10.00."
+ 
+    if amount < 0:
+        return False, "Payment cannot be negative."
+ 
+    if amount < total:
+        return False, "Payment is less than the total. Please enter a larger amount."
+ 
+    return True, amount
 
 
 class App:
