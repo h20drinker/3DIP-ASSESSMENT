@@ -1,5 +1,6 @@
 #takeaway ordering system verison 2
 
+import os
 import csv
 from datetime import datetime
 import tkinter as tk
@@ -77,6 +78,30 @@ def validate_payment(payment_text, total):
 def calculate_change(amount_paid, total):
     return round(amount_paid - total, 2)
 
+def save_order(order, amount_paid, change, filename=ORDERS_FILE):
+    file_exists = os.path.isfile(filename)
+ 
+    with open(filename, "a", newline="", encoding="utf-8") as csv_file:
+        writer = csv.writer(csv_file)
+ 
+        if not file_exists:
+            writer.writerow(["timestamp", "items", "total", "amount_paid", "change"])
+ 
+        items_summary = "; ".join(
+            f"{item.name} (${item.price:.2f})" for item in order.items
+        )
+        total = order.calculate_total()
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+ 
+        writer.writerow(
+            [
+                timestamp,
+                items_summary,
+                f"{total:.2f}",
+                f"{amount_paid:.2f}",
+                f"{change:.2f}",
+            ]
+        )
 
 class App:
     def __init__(self, root):
