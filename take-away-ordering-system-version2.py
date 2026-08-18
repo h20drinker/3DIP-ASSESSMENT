@@ -74,6 +74,9 @@ def validate_payment(payment_text, total):
  
     return True, amount
 
+def calculate_change(amount_paid, total):
+    return round(amount_paid - total, 2)
+
 
 class App:
     def __init__(self, root):
@@ -120,40 +123,44 @@ class App:
 
                 button.pack(pady=2)
 
-        order_frame = tk.LabelFrame(
-            self.root,
-            text="Current Order",
-            padx=10,
-            pady=10
-        )
-        order_frame.grid(
-            row=0,
-            column=1,
-            padx=10,
-            pady=10,
-            sticky="n"
-        )
-
-        self.order_listbox = tk.Listbox(
-            order_frame,
-            width=35,
-            height=12
-        )
+        order_frame = tk.LabelFrame(self.root, text="Current Order", padx=10, pady=10)
+        order_frame.grid(row=0, column=1, padx=10, pady=10, sticky="n")
+ 
+        self.order_listbox = tk.Listbox(order_frame, width=35, height=10)
         self.order_listbox.pack()
-
+ 
         self.total_label = tk.Label(
-            order_frame,
-            text="Total: $0.00",
-            font=("Arial", 12, "bold")
+            order_frame, text="Total: $0.00", font=("Arial", 12, "bold")
         )
-        self.total_label.pack(pady=(10, 5))
-
+        self.total_label.pack(pady=(10, 10))
+ 
+        
+        payment_row = tk.Frame(order_frame)
+        payment_row.pack(pady=5)
+ 
+        tk.Label(payment_row, text="Amount Paid: $").pack(side="left")
+        self.payment_entry = tk.Entry(payment_row, width=10)
+        self.payment_entry.pack(side="left")
+ 
+        button_row = tk.Frame(order_frame)
+        button_row.pack(pady=5)
+ 
+        complete_button = tk.Button(
+            button_row, text="Complete Order", command=self.complete_order
+        )
+        complete_button.pack(side="left", padx=5)
+ 
         clear_button = tk.Button(
-            order_frame,
-            text="Clear Order",
-            command=self.clear_order
+            button_row, text="Clear Order", command=self.clear_order
         )
-        clear_button.pack(pady=5)
+        clear_button.pack(side="left", padx=5)
+ 
+        self.change_label = tk.Label(order_frame, text="")
+        self.change_label.pack(pady=(10, 0))
+ 
+    def add_item_to_order(self, item):
+        self.order.add_item(item)
+        self.update_order_display()
 
 
     def add_item_to_order(self, item):
@@ -174,7 +181,8 @@ class App:
         self.total_label.config(
             text=f"Total: ${total:.2f}"
         )
-
+    def complete_order(self):
+        pass
 
     def clear_order(self):
         if not self.order.items:
