@@ -207,7 +207,42 @@ class App:
             text=f"Total: ${total:.2f}"
         )
     def complete_order(self):
-        pass
+        if not self.order.items:
+            messagebox.showerror(
+                "No Items",
+                "Please add at least one item before completing the order."
+            )
+            return
+
+        total = self.order.calculate_total()
+        payment_text = self.payment_entry.get()
+
+        is_valid, result = validate_payment(payment_text, total)
+
+        if not is_valid:
+            messagebox.showerror("Invalid Payment", result)
+            return
+
+        amount_paid = result
+        change = calculate_change(amount_paid, total)
+
+        save_order(self.order, amount_paid, change)
+
+        self.change_label.config(
+            text=f"Change given: ${change:.2f}"
+        )
+
+        messagebox.showinfo(
+            "Order Complete",
+            f"Order complete!\n"
+            f"Total: ${total:.2f}\n"
+            f"Paid: ${amount_paid:.2f}\n"
+            f"Change: ${change:.2f}"
+        )
+
+        self.order.clear()
+        self.payment_entry.delete(0, tk.END)
+        self.update_order_display()
 
     def clear_order(self):
         if not self.order.items:
