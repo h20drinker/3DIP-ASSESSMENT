@@ -6,15 +6,17 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import messagebox
 
+# File names used to store the menu and completed orders
 MENU_FILE = "menu.csv"
 ORDERS_FILE = "orders.csv"
 
-
+# Represents one item from the takeaway menu
 class MenuItem:
     def __init__(self, name, price):
         self.name = name
         self.price = price
 
+# Represents the customer's current order
 class Order:
     def __init__(self):
         self.items = []
@@ -27,6 +29,7 @@ class Order:
     def clear(self):
         self.items = []
 
+# Loads menu items from the menu CSV file
 def load_menu(filename):
     menu_items = []
     try: 
@@ -56,6 +59,7 @@ def load_menu(filename):
  
     return menu_items
 
+# Checks whether the customer's payment amount is valid
 def validate_payment(payment_text, total):
     payment_text = payment_text.strip()
 
@@ -75,9 +79,11 @@ def validate_payment(payment_text, total):
  
     return True, amount
 
+# Calculates how much change the customer should receive
 def calculate_change(amount_paid, total):
     return round(amount_paid - total, 2)
 
+# Saves a completed order to the orders CSV file
 def save_order(order, amount_paid, change, filename=ORDERS_FILE):
     file_exists = os.path.isfile(filename)
  
@@ -103,6 +109,8 @@ def save_order(order, amount_paid, change, filename=ORDERS_FILE):
             ]
         )
 
+# Main application class
+# Controls the graphical user interface and order system
 class App:
     def __init__(self, root):
         self.root = root
@@ -182,16 +190,13 @@ class App:
  
         self.change_label = tk.Label(order_frame, text="")
         self.change_label.pack(pady=(10, 0))
- 
+
+    # Adds a selected menu item to the current order
     def add_item_to_order(self, item):
         self.order.add_item(item)
         self.update_order_display()
 
-
-    def add_item_to_order(self, item):
-        self.order.add_item(item)
-        self.update_order_display()
-
+    # Updates the list of ordered items and the total shown on screen
     def update_order_display(self):
         self.order_listbox.delete(0, tk.END)
 
@@ -206,6 +211,8 @@ class App:
         self.total_label.config(
             text=f"Total: ${total:.2f}"
         )
+
+    # Completes the current order and processes the payment
     def complete_order(self):
         if not self.order.items:
             messagebox.showerror(
@@ -242,8 +249,10 @@ class App:
 
         self.order.clear()
         self.payment_entry.delete(0, tk.END)
+        self.change_label.config(text="")
         self.update_order_display()
 
+    # Clears the current order
     def clear_order(self):
         if not self.order.items:
             return
@@ -255,6 +264,7 @@ class App:
 
         if confirmed:
             self.order.clear()
+            self.change_label.config(text="")
             self.update_order_display()
 
 
