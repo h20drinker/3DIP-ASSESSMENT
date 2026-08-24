@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 # Name of the CSV file containing the menu items and prices
-MENU_FILE = "menue.csv"
+MENU_FILE = "menu.csv"
 
 # creating a class for menu items and orders
 class menu_item:
