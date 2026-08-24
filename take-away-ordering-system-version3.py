@@ -17,8 +17,13 @@ class MenuItem:
 class Order:
     def __init__(self):
         self.items = []
+
     def add_item(self, item):
         self.items.append(item)
+
+    def remove_item(self, index):
+        if 0 <= index < len(self.items):
+            del self.items[index]
 
     def calculate_total(self):
         return sum(item.price for item in self.items)
@@ -148,11 +153,21 @@ class App:
 
                 button.pack(pady=2)
 
+
         order_frame = tk.LabelFrame(self.root, text="Current Order", padx=10, pady=10)
         order_frame.grid(row=0, column=1, padx=10, pady=10, sticky="n")
  
         self.order_listbox = tk.Listbox(order_frame, width=35, height=10)
         self.order_listbox.pack()
+
+        remove_button = tk.Button(
+            order_frame, text="Remove Selected Item", command=self.remove_selected_item
+        )
+        remove_button.pack(pady=(5, 0))
+
+
+
+
  
         self.total_label = tk.Label(
             order_frame, text="Total: $0.00", font=("Arial", 12, "bold")
@@ -185,6 +200,18 @@ class App:
 
     def add_item_to_order(self, item):
         self.order.add_item(item)
+        self.update_order_display()
+
+    def remove_selected_item(self):
+        selection = self.order_listbox.curselection()
+        if not selection:
+            messagebox.showerror(
+                "No Selection", "Please select an item in the order to remove."
+            )
+            return
+ 
+        index = selection[0]
+        self.order.remove_item(index)
         self.update_order_display()
 
     def update_order_display(self):
