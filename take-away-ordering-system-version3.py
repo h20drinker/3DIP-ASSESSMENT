@@ -231,11 +231,23 @@ class App:
     def update_order_display(self):
         self.order_listbox.delete(0, tk.END)
 
+        item_counts = {}
+
         for item in self.order.items:
-            self.order_listbox.insert(
-                tk.END,
-                f"{item.name} - ${item.price:.2f}"
-            )
+            key = (item.name, item.price)
+
+            if key in item_counts:
+                item_counts[key] += 1
+            else:
+                item_counts[key] = 1
+
+        for (name, price), count in item_counts.items():
+            if count > 1:
+                display_text = f"{count} x {name} - ${price:.2f}"
+            else:
+                display_text = f"{name} - ${price:.2f}"
+
+            self.order_listbox.insert(tk.END, display_text)
 
         total = self.order.calculate_total()
 
