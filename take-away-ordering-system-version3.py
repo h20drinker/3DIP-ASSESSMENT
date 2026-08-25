@@ -84,19 +84,32 @@ def calculate_change(amount_paid, total):
 
 def save_order(order, amount_paid, change, filename=ORDERS_FILE):
     file_exists = os.path.isfile(filename)
- 
+
     with open(filename, "a", newline="", encoding="utf-8") as csv_file:
         writer = csv.writer(csv_file)
- 
+
         if not file_exists:
             writer.writerow(["timestamp", "items", "total", "amount_paid", "change"])
- 
+
+        item_counts = {}
+
+        for item in order.items:
+            key = (item.name, item.price)
+
+            if key in item_counts:
+                item_counts[key] += 1
+            else:
+                item_counts[key] = 1
+
         items_summary = "; ".join(
-            f"{item.name} (${item.price:.2f})" for item in order.items
+            f"{count} x {name} (${price:.2f})" if count > 1
+            else f"{name} (${price:.2f})"
+            for (name, price), count in item_counts.items()
         )
+
         total = order.calculate_total()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
- 
+
         writer.writerow(
             [
                 timestamp,
@@ -106,6 +119,7 @@ def save_order(order, amount_paid, change, filename=ORDERS_FILE):
                 f"{change:.2f}",
             ]
         )
+
 
 
 class App:
