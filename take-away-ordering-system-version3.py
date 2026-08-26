@@ -224,16 +224,34 @@ class App:
 
     # Removes the selected item from the current order
     def remove_selected_item(self):
-        selection = self.order_listbox.curselection()
-        if not selection:
-            messagebox.showerror(
-                "No Selection", "Please select an item in the order to remove."
-            )
-            return
- 
-        index = selection[0]
-        self.order.remove_item(index)
-        self.update_order_display()
+            selection = self.order_listbox.curselection()
+            if not selection:
+                messagebox.showerror(
+                    "No Selection", "Please select an item in the order to remove."
+                )
+                return
+     
+            selected_row = selection[0]
+     
+            grouped_keys = []
+            seen_keys = set()
+            for item in self.order.items:
+                key = (item.name, item.price)
+                if key not in seen_keys:
+                    grouped_keys.append(key)
+                    seen_keys.add(key)
+     
+            if selected_row >= len(grouped_keys):
+                return
+     
+            target_key = grouped_keys[selected_row]
+     
+            for i, item in enumerate(self.order.items):
+                if (item.name, item.price) == target_key:
+                    self.order.remove_item(i)
+                    break
+     
+            self.update_order_display()
 
     # Updates the listbox and total whenever the order changes
     def update_order_display(self):
