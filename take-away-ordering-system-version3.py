@@ -1,19 +1,23 @@
 #takeaway ordering system verison 3
 
+# Import modules needed by the program
 import os
 import csv
 from datetime import datetime
 import tkinter as tk
 from tkinter import messagebox
 
+# Names of the CSV files used by the program
 MENU_FILE = "menu.csv"
 ORDERS_FILE = "orders.csv"
 
+# Represents one item on the takeaway menu
 class MenuItem:
     def __init__(self, name, price):
         self.name = name
         self.price = price
 
+# Represents the customer's current order
 class Order:
     def __init__(self):
         self.items = []
@@ -31,6 +35,7 @@ class Order:
     def clear(self):
         self.items = []
 
+# Reads menu items from the menu.csv file
 def load_menu(filename):
     menu_items = []
     try: 
@@ -60,6 +65,7 @@ def load_menu(filename):
  
     return menu_items
 
+# Checks whether the customer's payment amount is valid
 def validate_payment(payment_text, total):
     payment_text = payment_text.strip()
 
@@ -79,9 +85,11 @@ def validate_payment(payment_text, total):
  
     return True, amount
 
+# Calculates how much change the customer should receive
 def calculate_change(amount_paid, total):
     return round(amount_paid - total, 2)
 
+# Saves a completed order into the orders.csv file
 def save_order(order, amount_paid, change, filename=ORDERS_FILE):
     file_exists = os.path.isfile(filename)
 
@@ -110,6 +118,7 @@ def save_order(order, amount_paid, change, filename=ORDERS_FILE):
         total = order.calculate_total()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+# Write the completed order into the CSV file
         writer.writerow(
             [
                 timestamp,
@@ -120,8 +129,7 @@ def save_order(order, amount_paid, change, filename=ORDERS_FILE):
             ]
         )
 
-
-
+# Controls the main graphical user interface
 class App:
     def __init__(self, root):
         self.root = root
@@ -132,6 +140,7 @@ class App:
 
         self.build_gui()
 
+    # Creates the buttons, labels, entry boxes and order list
     def build_gui(self):
         menu_frame = tk.LabelFrame(
             self.root,
@@ -174,15 +183,12 @@ class App:
         self.order_listbox = tk.Listbox(order_frame, width=35, height=10)
         self.order_listbox.pack()
 
+        # Create a button that allows the user to remove selected items from the order listbox
         remove_button = tk.Button(
             order_frame, text="Remove Selected Item", command=self.remove_selected_item
         )
         remove_button.pack(pady=(5, 0))
 
-
-
-
- 
         self.total_label = tk.Label(
             order_frame, text="Total: $0.00", font=("Arial", 12, "bold")
         )
@@ -211,11 +217,12 @@ class App:
  
         self.change_label = tk.Label(order_frame, text="")
         self.change_label.pack(pady=(10, 0))
-
+    # Adds a selected menu item to the current order
     def add_item_to_order(self, item):
         self.order.add_item(item)
         self.update_order_display()
 
+    # Removes the selected item from the current order
     def remove_selected_item(self):
         selection = self.order_listbox.curselection()
         if not selection:
@@ -228,6 +235,7 @@ class App:
         self.order.remove_item(index)
         self.update_order_display()
 
+    # Updates the listbox and total whenever the order changes
     def update_order_display(self):
         self.order_listbox.delete(0, tk.END)
 
@@ -255,6 +263,7 @@ class App:
             text=f"Total: ${total:.2f}"
         )
 
+    # Completes the customer's order after payment is entered
     def complete_order(self):
         if not self.order.items:
             messagebox.showerror(
@@ -294,6 +303,7 @@ class App:
         self.change_label.config(text="")
         self.update_order_display()
 
+    # Clears the current order without completing it
     def clear_order(self):
         if not self.order.items:
             return
