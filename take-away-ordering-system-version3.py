@@ -340,5 +340,7 @@ class App:
 
 if __name__ == "__main__":
     root = tk.Tk()
+    root.title("Takeaway Order System")
+    root.resizable(False, False)
     app = App(root)
     root.mainloop()
